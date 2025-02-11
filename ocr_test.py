@@ -1,58 +1,48 @@
+import fitz  # PyMuPDF
 import pytesseract
-from pdf2image import convert_from_path
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 from pdfminer.high_level import extract_text
-import difflib
+from PIL import Image
+import io
+import easyocr
 
-# Path to the PDF file
-pdf_path = "./Raw Material.pdf"
-
-
-# Function to extract text using pdfminer (without OCR)
-def extract_text_pdfminer(pdf_path):
-    try:
-        text = extract_text(pdf_path)
-        if text.strip():
-            return text
-    except Exception as e:
-        print(f"PDFMiner failed: {e}")
-    return ""
+def extract_text_from_pdf(pdf_path):
+    """Extracts text from a PDF. Uses OCR only if necessary."""
+    # Try to extract text using pdfminer (for non-scanned PDFs)
+    # text = extract_text(pdf_path).strip()
+    # text = pytesseract.image_to_string(processed_image, config="--oem 3 --psm 6")
 
 
-# Function to extract text using OCR (Tesseract) from images
-def extract_text_ocr(pdf_path):
-    images = convert_from_path(pdf_path, dpi=300)  # Convert PDF to images
-    extracted_text = []
+    reader = easyocr.Reader(['en'])
+    text = reader.readtext("sample_image.png", detail=0)
 
-    for i, image in enumerate(images):
-        text = pytesseract.image_to_string(image)  # Apply OCR
-        extracted_text.append(text)
-        print(f"Extracted text from page {i + 1}...")
+    if text:
+        return text  # If text is found, return it (no OCR needed)
 
-    return "\n".join(extracted_text)
+    # If text is empty, assume it's a scanned PDF and use OCR
+    print("No text found. Using OCR...")
+    text = []
+    doc = fitz.open(pdf_path)
+
+    for page in doc:
+        images = page.get_images(full=True)
+        for img_index, img in enumerate(images):
+            base_image = doc.extract_image(img[0])
+            image_data = base_image["image"]
+            image = Image.open(io.BytesIO(image_data))
+
+            text.append(pytesseract.image_to_string(image))
+
+    return "\n".join(text)
 
 
-# Extract text using both methods
-pdfminer_text = extract_text_pdfminer(pdf_path)
-ocr_text = extract_text_ocr(pdf_path)
+# Example usage
+pdf_path = "Raw Material.pdf"
+extracted_text = extract_text_from_pdf(pdf_path)
 
-# Save extracted text to files
-pdfminer_text_path = "/mnt/data/pdfminer_text.txt"
-ocr_text_path = "/mnt/data/ocr_text.txt"
+print("Extracted Text:\n", extracted_text)
+# Save extracted text to a text file
+output_path = pdf_path.replace(".pdf", ".txt")
+with open(output_path, "w", encoding="utf-8") as output_file:
+    output_file.write(extracted_text)
 
-with open(pdfminer_text_path, "w", encoding="utf-8") as f:
-    f.write(pdfminer_text)
-
-with open(ocr_text_path, "w", encoding="utf-8") as f:
-    f.write(ocr_text)
-
-# Compare both texts using difflib
-diff = difflib.unified_diff(pdfminer_text.splitlines(), ocr_text.splitlines(),
-                            fromfile="PDFMiner", tofile="OCR", lineterm="")
-
-# Save comparison results
-diff_path = "/mnt/data/text_comparison.txt"
-with open(diff_path, "w", encoding="utf-8") as f:
-    f.write("\n".join(diff))
-
-print(f"Extracted text saved to:\n- PDFMiner: {pdfminer_text_path}\n- OCR: {ocr_text_path}")
-print(f"Comparison saved to: {diff_path}")
