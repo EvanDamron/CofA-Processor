@@ -1,0 +1,76 @@
+# Chevron Oronite Co LLC
+
+## Oronite-Oak Point Plant
+10285 Highway 23 South  
+BELLE CHASSE 7037-0058  
+Tel : (504)391-6101 Fax : (504)391-6144  
+
+---
+
+# Certificate of Analysis
+
+**Ship to**  
+VGP HOLDINGS LLC  
+3901 RIVER ROAD  
+CINCINNATI  
+CH  
+45204-1033  
+US  
+Tel No :  
+Fax No:  
+Ref No / Cust PO / Date :  
+5546876 / TBD 01/06/2025  
+
+---
+
+**Shipment Details**  
+Delivery No.  
+80719098  
+Product Name  
+OLOA@55603  
+Batch Number  
+2025021820  
+Vehicle Number  
+COCX280978  
+Production Date  
+01/12/2025  
+Shelf life Exp Date  
+01/12/2027  
+Quantity  
+21,078.652 GA  
+
+---
+
+### Property
+
+|    | UOM | Test Method | Results | Minimum | Maximum |
+|---|---|---|---|---|---|
+| APPEARANCE OF PRODUCT | VISUAL | BROWN | Brown |    |    |
+| BASE NUMBER(TBN) | mgKOH/g | ASTM D2896 | 85.9 | 75.3 | 92.1 |
+| BORON    | %Weight | ASTM D4951 | 0.1420 | 0.110 | 0.150 |
+| CALCIUM    | %Weight | ASTM D4951 | 1.5060 | 1.380 | 1.600 |
+| DENSITY @ 15C | Kg/Liter | ASTM D4052 | 0.9672 |    |    |
+| IR SCAN    | OAM 1030 | MATCHES | Matches |    |    |
+| MAGNESIUM    | %Weight | ASTM D4951 | 0.5710 | 0.490 | 0.610 |
+| MOLYBDENUM   | %Weight | ASTM D4951 | 0.3440 | 0.280 | 0.380 |
+| NITROGEN    | %Weight | ASTM D5291 | 0.950 | 0.860 | 1.060 |
+| PHOSPHORUS    | %Weight | ASTM D4951 | 0.7850 | 0.730 | 0.850 |
+| VISCOSITY @ 100C | Centistoke | ASTM D445 | 99.45 | 77.00 | 129.00 |
+| ZINC    | %Weight | ASTM D4951 | 0.9070 | 0.830 | 0.990 |
+
+---
+
+This is to certify that product shipped on this order has been manufactured and tested in accordance with Purchase order requirements and inspected during various stages of manufacture.
+
+---
+
+Rodney H. Bauer III  
+Laboratory Manager  
+Phone: 504-391-6197  
+01/15/2025 & 09:04:43  
+
+---
+
+This is a computer generated document hence signature is not required.
+
+page 1 of 1
