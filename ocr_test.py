@@ -9,12 +9,7 @@ import easyocr
 def extract_text_from_pdf(pdf_path):
     """Extracts text from a PDF. Uses OCR only if necessary."""
     # Try to extract text using pdfminer (for non-scanned PDFs)
-    # text = extract_text(pdf_path).strip()
-    # text = pytesseract.image_to_string(processed_image, config="--oem 3 --psm 6")
-
-
-    reader = easyocr.Reader(['en'])
-    text = reader.readtext("sample_image.png", detail=0)
+    text = extract_text(pdf_path).strip()
 
     if text:
         return text  # If text is found, return it (no OCR needed)
@@ -42,7 +37,7 @@ extracted_text = extract_text_from_pdf(pdf_path)
 
 print("Extracted Text:\n", extracted_text)
 # Save extracted text to a text file
-output_path = pdf_path.replace(".pdf", ".txt")
+output_path = "Raw Material Test.txt"
 with open(output_path, "w", encoding="utf-8") as output_file:
     output_file.write(extracted_text)
 
