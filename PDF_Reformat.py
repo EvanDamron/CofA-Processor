@@ -26,7 +26,7 @@ column_boundaries = np.where(vertical_histogram < column_threshold)[0]
 column_indices = []
 prev = 0
 for i in range(1, len(column_boundaries)):
-    if column_boundaries[i] - column_boundaries[i - 1] > 50:  # Minimum gap size
+    if column_boundaries[i] - column_boundaries[i - 1] > 1000:  # Minimum gap size
         column_indices.append((prev, column_boundaries[i - 1]))
         prev = column_boundaries[i]
 column_indices.append((prev, column_boundaries[-1]))  # Last column
@@ -40,7 +40,7 @@ row_boundaries = np.where(horizontal_histogram < row_threshold)[0]
 row_indices = []
 prev = 0
 for i in range(1, len(row_boundaries)):
-    if row_boundaries[i] - row_boundaries[i - 1] > 20:  # Minimum gap size
+    if row_boundaries[i] - row_boundaries[i - 1] > 1000:  # Minimum gap size
         row_indices.append((prev, row_boundaries[i - 1]))
         prev = row_boundaries[i]
 row_indices.append((prev, row_boundaries[-1]))  # Last row
