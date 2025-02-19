@@ -105,6 +105,7 @@ import cv2
 import pytesseract
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
+import random
 import numpy as np
 
 
@@ -128,6 +129,73 @@ def merge_two_boxes(box1, box2):
         "right": max(box1['right'], box2['right']),
         "bottom": max(box1['bottom'], box2['bottom'])
     }
+
+
+import matplotlib.pyplot as plt
+from PIL import Image, ImageDraw, ImageFont
+import random
+
+
+def random_color():
+    """Generate a random RGB color."""
+    return tuple(random.randint(50, 200) for _ in range(3))
+
+
+def draw_text_boxes(image, data, clusters):
+    """
+    Draw original OCR text boxes and clustered merged boxes with different colors.
+
+    Parameters:
+    - image: PIL.Image object.
+    - data: Original Tesseract output data dictionary (with 'text', 'left', 'top', 'width', 'height').
+    - clusters: List of clusters, where each cluster is a list of merged box dictionaries.
+    """
+    before_image = image.copy()
+    after_image = image.copy()
+
+    before_draw = ImageDraw.Draw(before_image)
+    after_draw = ImageDraw.Draw(after_image)
+
+    try:
+        font = ImageFont.truetype("arial.ttf", 12)
+    except:
+        font = ImageFont.load_default()
+
+    # Draw original boxes (red)
+    for i in range(len(data['text'])):
+        if data['text'][i].strip():
+            x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
+            before_draw.rectangle([(x, y), (x + w, y + h)], outline="red", width=2)
+            before_draw.text((x, y - 10), data['text'][i], fill="red", font=font)
+
+    # Draw merged clusters with different colors
+    for cluster in clusters:
+        cluster_color = random_color()  # Different color for each cluster
+        for box in cluster:
+            after_draw.rectangle(
+                [(box['left'], box['top']), (box['right'], box['bottom'])],
+                outline=cluster_color,
+                width=3
+            )
+            after_draw.text(
+                (box['left'], box['top'] - 10),
+                box['text'],
+                fill=cluster_color,
+                font=font
+            )
+
+    # Display side-by-side comparison
+    fig, axes = plt.subplots(1, 2, figsize=(20, 12))
+
+    axes[0].imshow(before_image)
+    axes[0].set_title("Before Merging (Original Text Boxes)")
+    axes[0].axis("off")
+
+    axes[1].imshow(after_image)
+    axes[1].set_title("After Merging (Clustered Merged Text Boxes)")
+    axes[1].axis("off")
+
+    plt.show()
 
 
 def iterative_merge_text_boxes(data, horizontal_threshold=30, vertical_threshold=10):
@@ -172,44 +240,44 @@ def iterative_merge_text_boxes(data, horizontal_threshold=30, vertical_threshold
     return boxes
 
 
-def draw_text_boxes(image, data, merged_boxes):
-    """Draw original and merged text boxes for comparison."""
-
-    before_image = image.copy()
-    after_image = image.copy()
-
-    before_draw = ImageDraw.Draw(before_image)
-    after_draw = ImageDraw.Draw(after_image)
-
-    try:
-        font = ImageFont.truetype("arial.ttf", 12)
-    except:
-        font = ImageFont.load_default()
-
-    # Draw original boxes (red)
-    for i in range(len(data['text'])):
-        if data['text'][i].strip():
-            x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
-            before_draw.rectangle([(x, y), (x + w, y + h)], outline="red", width=2)
-            before_draw.text((x, y - 10), data['text'][i], fill="red", font=font)
-
-    # Draw merged boxes (green)
-    for box in merged_boxes:
-        after_draw.rectangle([(box['left'], box['top']), (box['right'], box['bottom'])], outline="green", width=3)
-        after_draw.text((box['left'], box['top'] - 10), box['text'], fill="green", font=font)
-
-    # Display side-by-side comparison
-    fig, axes = plt.subplots(1, 2, figsize=(20, 12))
-
-    axes[0].imshow(before_image)
-    axes[0].set_title("Before Merging (Original Text Boxes)")
-    axes[0].axis("off")
-
-    axes[1].imshow(after_image)
-    axes[1].set_title("After Merging (Merged Text Boxes)")
-    axes[1].axis("off")
-
-    plt.show()
+# def draw_text_boxes(image, data, merged_boxes):
+#     """Draw original and merged text boxes for comparison."""
+#
+#     before_image = image.copy()
+#     after_image = image.copy()
+#
+#     before_draw = ImageDraw.Draw(before_image)
+#     after_draw = ImageDraw.Draw(after_image)
+#
+#     try:
+#         font = ImageFont.truetype("arial.ttf", 12)
+#     except:
+#         font = ImageFont.load_default()
+#
+#     # Draw original boxes (red)
+#     for i in range(len(data['text'])):
+#         if data['text'][i].strip():
+#             x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
+#             before_draw.rectangle([(x, y), (x + w, y + h)], outline="red", width=2)
+#             before_draw.text((x, y - 10), data['text'][i], fill="red", font=font)
+#
+#     # Draw merged boxes (green)
+#     for box in merged_boxes:
+#         after_draw.rectangle([(box['left'], box['top']), (box['right'], box['bottom'])], outline="green", width=3)
+#         after_draw.text((box['left'], box['top'] - 10), box['text'], fill="green", font=font)
+#
+#     # Display side-by-side comparison
+#     fig, axes = plt.subplots(1, 2, figsize=(20, 12))
+#
+#     axes[0].imshow(before_image)
+#     axes[0].set_title("Before Merging (Original Text Boxes)")
+#     axes[0].axis("off")
+#
+#     axes[1].imshow(after_image)
+#     axes[1].set_title("After Merging (Merged Text Boxes)")
+#     axes[1].axis("off")
+#
+#     plt.show()
 
 
 def process_image(image_path, horizontal_threshold=30, vertical_threshold=10):
@@ -218,6 +286,7 @@ def process_image(image_path, horizontal_threshold=30, vertical_threshold=10):
 
     # Run OCR
     custom_config = r'--oem 1 --psm 11'
+    # custom_config = r'--oem 1 --psm 3'
     data = pytesseract.image_to_data(image, config=custom_config, output_type=pytesseract.Output.DICT)
 
     # Iteratively merge text boxes
@@ -233,11 +302,60 @@ def process_image(image_path, horizontal_threshold=30, vertical_threshold=10):
         print(
             f"Text: '{box['text']}', Left: {box['left']}, Top: {box['top']}, Right: {box['right']}, Bottom: {box['bottom']}")
 
+    clusters = cluster_boxes_by_bottom(merged_boxes)
+    # display_clusters(clusters)
     # Draw before and after merging
-    draw_text_boxes(image, data, merged_boxes)
+    draw_text_boxes(image, data, clusters)
 
 
-# ---- Run the function ---- #
-image_path = "viscoplex_cofa.png"  # Replace with your image path
+def cluster_boxes_by_bottom(merged_boxes, bottom_threshold=20):
+    """
+    Cluster merged OCR boxes based on their 'bottom' value.
+
+    Parameters:
+    - merged_boxes: List of dictionaries with 'text', 'left', 'top', 'right', 'bottom'.
+    - bottom_threshold: Int, max difference in 'bottom' values to consider for the same cluster.
+
+    Returns:
+    - List of clusters (each cluster is a list of boxes).
+    """
+    # Sort boxes by 'bottom' value
+    sorted_boxes = sorted(merged_boxes, key=lambda x: x['bottom'])
+
+    clusters = []
+    current_cluster = [sorted_boxes[0]]
+
+    for box in sorted_boxes[1:]:
+        # Check if box is close enough to the current cluster's 'bottom' reference
+        if abs(box['bottom'] - current_cluster[-1]['bottom']) <= bottom_threshold:
+            current_cluster.append(box)
+        else:
+            # Start a new cluster if the 'bottom' values differ beyond threshold
+            clusters.append(current_cluster)
+            current_cluster = [box]
+
+    clusters.append(current_cluster)  # Add the last cluster
+    return clusters
+
+
+def display_clusters(clusters):
+    """
+    Display the clustered OCR boxes.
+
+    Parameters:
+    - clusters: List of clusters with text boxes.
+    """
+    for i, cluster in enumerate(clusters, 1):
+        print(f"\n🔹 Cluster {i}:")
+        # Sort by 'left' to maintain reading order within the line
+        for box in sorted(cluster, key=lambda x: x['left']):
+            print(f"  Text: {box['text'].strip()}  (bottom: {box['bottom']}, Left: {box['left']})")
+
+
+     # ---- Run the function ---- #
+# image_path = "viscoplex_cofa.png"  # Replace with your image path
+image_path = "Raw Material.png"
+# image_path = "pure_performance_cofa.png"
+# image_path = "viscoplex_cofa.png"
 process_image(image_path, horizontal_threshold=40, vertical_threshold=10)  # Adjust thresholds as needed
 
