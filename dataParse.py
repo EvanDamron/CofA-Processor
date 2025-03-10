@@ -3,8 +3,7 @@ import psycopg2
 
 def normalize_na(value):
     """
-    If value is exactly 'N/A', return None (which becomes NULL in Postgres),
-    otherwise return the original value.
+    If the value is N/A switch it with None so the value in the database stays as NULL.
     """
     return None if value == "N/A" else value
 
