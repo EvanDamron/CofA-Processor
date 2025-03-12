@@ -1,6 +1,13 @@
 import json
 import psycopg2
 
+def clean_signature(signature):
+    # Format the signature correctly
+    if isinstance(signature, list):
+        # Join the list into a single string.
+        signature = ''.join(signature)
+    return signature.replace('{', '').replace('}', '').replace('"', '')
+
 def normalize_na(value):
     """
     If the value is a form of null switch it with None so the value in the database stays as NULL.
@@ -22,6 +29,7 @@ def insert_cofa_and_tests(json_path):
     with open (json_path, "r") as f:
         data = json.load(f)
 
+
     # Insert query for the CofA
     insert_query = """
         INSERT INTO cofas(
@@ -40,9 +48,10 @@ def insert_cofa_and_tests(json_path):
             purchase_order_number,
             tank_number,
             vehicle_number,
-            shelf_life_exp_date
+            shelf_life_exp_date,
+            signature
         )
-        VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
     """
 
@@ -66,6 +75,7 @@ def insert_cofa_and_tests(json_path):
             normalize_na(data.get("tank_number", "")),
             normalize_na(data.get("vehicle_number", "")),
             normalize_na(data.get("shelf_life_exp_date", "")),
+            clean_signature(normalize_na(data.get("signature", "")))
         )
     )
     # Get the ID associated with this CofA
@@ -93,7 +103,6 @@ def insert_cofa_and_tests(json_path):
     uoms = data.get("uom", [])
     min_specs = data.get("min_spec", [])
     max_specs = data.get("max_spec", [])
-    #signatures = data.get("signature", [])
 
     length = min(
         len(test_names),
@@ -102,7 +111,6 @@ def insert_cofa_and_tests(json_path):
         len(uoms),
         len(min_specs),
         len(max_specs),
-        #len(signatures)
     )
 
     for i in range(length):
@@ -116,7 +124,6 @@ def insert_cofa_and_tests(json_path):
                 normalize_na(uoms[i]),
                 normalize_na(min_specs[i]),
                 normalize_na(max_specs[i]),
-                # normalize_na(signatures[i])
             )
         )
 
@@ -127,4 +134,4 @@ def insert_cofa_and_tests(json_path):
 
 if __name__ == "__main__":
     # Change raw material.json into whatever variable the json files will be coming in as
-    insert_cofa_and_tests("vtx6_prompt1.json")
+    insert_cofa_and_tests("yubase_prompt1.json")
