@@ -1,0 +1,67 @@
+{
+    "product_name": "LUBRIZOL\u00ae 3300A, 51798",
+    "product_description": "N/A",
+    "customer_material_number": "890000299570",
+    "quantity": "43,980 LBS",
+    "batch_number": "N/A",
+    "manufacturing_date": "N/A",
+    "delivery_number": "40874826",
+    "delivery_item": "N/A",
+    "delivery_date": "FEB 02, 2025",
+    "receiving_date": "N/A",
+    "oil_additives": "N/A",
+    "customer_number": "N/A",
+    "purchase_order_number": "4522587097",
+    "tank_number": "N/A",
+    "vehicle_number": "N/A",
+    "shelf_life_exp_date": "N/A",
+    "test_name": [
+        "SPECIFIC GRAVITY @ 15.6 C",
+        "BORON",
+        "CALCIUM",
+        "VISCOSITY @ 100 C, CST",
+        "PHOSPHORUS"
+    ],
+    "appearance": [
+        "N/A",
+        "N/A",
+        "N/A",
+        "N/A",
+        "N/A"
+    ],
+    "value": [
+        "0.934",
+        "0.167",
+        "0.860",
+        "31.8",
+        "0.603"
+    ],
+    "uom": [
+        "SPGRAV",
+        "%",
+        "%",
+        "CST",
+        "%"
+    ],
+    "min_spec": [
+        "0.930",
+        "0.157",
+        "0.820",
+        "27.0",
+        "0.540"
+    ],
+    "max_spec": [
+        "0.960",
+        "0.197",
+        "0.980",
+        "33.0",
+        "0.660"
+    ],
+    "signature": [
+        "Quality Assurance",
+        "N/A",
+        "N/A",
+        "N/A",
+        "N/A"
+    ]
+}
