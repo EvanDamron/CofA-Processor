@@ -3,9 +3,9 @@ import psycopg2
 
 def normalize_na(value):
     """
-    If the value is N/A switch it with None so the value in the database stays as NULL.
+    If the value is a form of null switch it with None so the value in the database stays as NULL.
     """
-    return None if value == "N/A" else value
+    return None if value in ("N/A", "null", "Null") else value
 
 # Connect to the database
 def insert_cofa_and_tests(json_path):
@@ -127,4 +127,4 @@ def insert_cofa_and_tests(json_path):
 
 if __name__ == "__main__":
     # Change raw material.json into whatever variable the json files will be coming in as
-    insert_cofa_and_tests("raw material.json")
+    insert_cofa_and_tests("vtx6_prompt1.json")
