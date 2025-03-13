@@ -1,0 +1,53 @@
+{
+    "product_name": "VISCOPLEX\u00ae 0-112(5001)",
+    "product_description": "175 KG Steel Drum 1A1",
+    "customer_material_number": "101488",
+    "quantity": "12 EA",
+    "batch_number": "72934262",
+    "manufacturing_date": "06.2024",
+    "delivery_number": "3010737368 / 000001",
+    "delivery_item": "N/A",
+    "delivery_date": "Aug 19, 2024",
+    "receiving_date": "N/A",
+    "oil_additives": "N/A",
+    "customer_number": "251040",
+    "purchase_order_number": "4522562728",
+    "tank_number": "N/A",
+    "vehicle_number": "N/A",
+    "shelf_life_exp_date": "N/A",
+    "test_name": [
+        "VISUAL",
+        "ASTM D 445",
+        "ASTM D 445"
+    ],
+    "appearance": [
+        "APPEARANCE",
+        "PRODUCT VISCOSITY 100\u00b0C",
+        "KIN. VISCOSITY 100\u00b0C"
+    ],
+    "value": [
+        "in spec.",
+        "297",
+        "10.60"
+    ],
+    "uom": [
+        "N/A",
+        "mm\u00b2/s",
+        "mm\u00b2/s"
+    ],
+    "min_spec": [
+        "N/A",
+        "175",
+        "10.40"
+    ],
+    "max_spec": [
+        "clear to slightly hazy",
+        "350",
+        "11.00"
+    ],
+    "signature": [
+        "Ryan Dumouchel",
+        "Pamela Spencer",
+        "N/A"
+    ]
+}
