@@ -1,0 +1,81 @@
+{
+    "product_name": "HITEC\u00ae 8888C Drum",
+    "product_description": "N/A",
+    "customer_material_number": "031505",
+    "quantity": "N/A",
+    "batch_number": "1024SA012A",
+    "manufacturing_date": "OCTOBER, 2024",
+    "delivery_number": "N/A",
+    "delivery_item": "HITEC\u00ae 8888C Drum",
+    "delivery_date": "October 29, 2024",
+    "receiving_date": "N/A",
+    "oil_additives": "N/A",
+    "customer_number": "N/A",
+    "purchase_order_number": "4522561528",
+    "tank_number": "N/A",
+    "vehicle_number": "N/A",
+    "shelf_life_exp_date": "October 1, 2026",
+    "test_name": [
+        "Calcium",
+        "Nitrogen",
+        "Phosphorus",
+        "Zinc",
+        "Flash Point, PMCC",
+        "Specific Gravity @ 15.6\u00b0C",
+        "Kinematic Viscosity @ 100\u00b0C",
+        "Appearance"
+    ],
+    "appearance": [
+        "%M",
+        "%M",
+        "%M",
+        "%M",
+        "\u00b0C",
+        "-",
+        "cSt",
+        "-"
+    ],
+    "value": [
+        "3.97",
+        "0.44",
+        "1.43",
+        "1.70",
+        "140",
+        "1.017",
+        "35",
+        "PASS"
+    ],
+    "uom": [
+        "D4951",
+        "D5291 Mod",
+        "D4951",
+        "D4951",
+        "D93",
+        "D4052",
+        "D445",
+        "EC-112A"
+    ],
+    "min_spec": [
+        "3.80",
+        "0.40",
+        "1.37",
+        "1.64",
+        "120",
+        "1.000",
+        "23",
+        "-"
+    ],
+    "max_spec": [
+        "4.38",
+        "0.50",
+        "1.59",
+        "1.90",
+        "-",
+        "1.030",
+        "41",
+        "-"
+    ],
+    "signature": [
+        "N/A"
+    ]
+}

@@ -1,0 +1,67 @@
+{
+    "product_name": "LUBRIZOL\u00ae 6473, 101450",
+    "product_description": "N/A",
+    "customer_material_number": "N/A",
+    "quantity": "4 DR",
+    "batch_number": "000016089",
+    "manufacturing_date": "NOV 23, 2021",
+    "delivery_number": "40585273",
+    "delivery_item": "N/A",
+    "delivery_date": "NOV 14, 2022",
+    "receiving_date": "N/A",
+    "oil_additives": "N/A",
+    "customer_number": "N/A",
+    "purchase_order_number": "4522416678",
+    "tank_number": "N/A",
+    "vehicle_number": "N/A",
+    "shelf_life_exp_date": "N/A",
+    "test_name": [
+        "CALCIUM",
+        "BASE NUMBER (mgKOH/g)",
+        "VISCOSITY @ 100 C, CST",
+        "MANUFACTURING DATE",
+        "RECOMMENDED RETEST DATE"
+    ],
+    "appearance": [
+        "%",
+        "NeutNo",
+        "CST",
+        "N/A",
+        "N/A"
+    ],
+    "value": [
+        "4.77",
+        "85.88",
+        "27.6",
+        "NOV 23, 2021",
+        "NOV 23, 2023"
+    ],
+    "uom": [
+        "%",
+        "NeutNo",
+        "CST",
+        "N/A",
+        "N/A"
+    ],
+    "min_spec": [
+        "4.65",
+        "85.00",
+        "25.0",
+        "NOV 23, 2021",
+        "NOV 23, 2023"
+    ],
+    "max_spec": [
+        "4.90",
+        "N/A",
+        "N/A",
+        "N/A",
+        "N/A"
+    ],
+    "signature": [
+        "Quality Assurance",
+        "N/A",
+        "N/A",
+        "N/A",
+        "N/A"
+    ]
+}
