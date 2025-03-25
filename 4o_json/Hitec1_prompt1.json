@@ -1,0 +1,81 @@
+{
+    "product_name": "HITEC \u00ae 11192 Bulk",
+    "product_description": "N/A",
+    "customer_material_number": "031546",
+    "quantity": "N/A",
+    "batch_number": "0125SA001A",
+    "manufacturing_date": "JANUARY, 2025",
+    "delivery_number": "N/A",
+    "delivery_item": "HITEC \u00ae 11192 Bulk",
+    "delivery_date": "February 10, 2025",
+    "receiving_date": "N/A",
+    "oil_additives": "N/A",
+    "customer_number": "N/A",
+    "purchase_order_number": "0001409912",
+    "tank_number": "N/A",
+    "vehicle_number": "N/A",
+    "shelf_life_exp_date": "July 1, 2026",
+    "test_name": [
+        "Calcium",
+        "Molybdenum",
+        "Nitrogen",
+        "Phosphorus",
+        "Zinc",
+        "Flash Point, PMCC",
+        "Specific Gravity @ 15.6\u00b0C",
+        "Kinematic Viscosity @ 100\u00b0C"
+    ],
+    "appearance": [
+        "%M",
+        "%M",
+        "%M",
+        "%M",
+        "%M",
+        "\u00b0C",
+        "-",
+        "cSt"
+    ],
+    "value": [
+        "0.72",
+        "0.64",
+        "1.08",
+        "0.39",
+        "0.41",
+        "155",
+        "0.948",
+        "54"
+    ],
+    "uom": [
+        "D4951",
+        "D4951",
+        "D5291 Mod",
+        "D4951",
+        "D4951",
+        "D93",
+        "D4052",
+        "D445"
+    ],
+    "min_spec": [
+        "0.59",
+        "0.59",
+        "0.96",
+        "0.32",
+        "0.36",
+        "135",
+        "0.932",
+        "44"
+    ],
+    "max_spec": [
+        "0.73",
+        "0.76",
+        "1.24",
+        "0.44",
+        "0.48",
+        "N/A",
+        "0.962",
+        "66"
+    ],
+    "signature": [
+        "Melissa Williams"
+    ]
+}
