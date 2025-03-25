@@ -17,7 +17,7 @@ def normalize_na(value):
 # Connect to the database
 def insert_cofa_and_tests(json_path):
     connection = psycopg2.connect(
-        host="localhost",
+        host="34.204.5.67",
         port=5432,
         user="admin",
         password="admin123",
