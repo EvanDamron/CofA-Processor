@@ -6,8 +6,7 @@ import os
 
 # Initialize OpenAI client
 # read api key from text file
-with open('openai_api_key.txt', 'r') as file:
-    api_key = file.read().replace('\n', '')
+api_key = os.getenv("OPENAI_API_KEY")
 client = openai.Client(api_key=api_key)
 
 
