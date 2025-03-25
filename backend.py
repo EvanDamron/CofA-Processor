@@ -7,12 +7,16 @@ import os
 import io
 import model_eval
 import json
+import logging
+from dataParse import insert_cofa_and_tests_from_dict
 
 app = Flask(__name__)
 
 
 @app.route('/upload', methods=['POST', 'GET'])
 def upload_file():
+    print('made it here, connection established')
+    logging.debug('made it here, connection established')
     if 'file' not in request.files:
         return {'error': 'No file provided'}, 400
 
@@ -37,7 +41,9 @@ def upload_file():
         # Send to chatGPT
         response = extract_json_from_image(prompt, model, image_path)
         print(response)
-        print("Processed!")  # Prints to your terminal when a file is processed
+        print("Processed!")
+        logging.info(response)
+        logging.info("Processed!")  # Prints to your terminal when a file is processed
 
         # Cleanup
         doc.close()
@@ -62,10 +68,14 @@ def verify_and_save():
         return {'error': str(e)}, 500
 
 
-# Placeholder for the database population function
 def populate_database(data: dict):
-    # Replace this with your actual database population logic
-    print("Populating database with:", data)
+    try:
+        insert_cofa_and_tests_from_dict(data)
+        logging.info("Database populated successfully!")
+    except Exception as e:
+        logging.error(f"Error populating database: {e}")
+        raise e
+
 
 
 def extract_json_from_image(prompt: str, model: str, image_path: str) -> dict:
