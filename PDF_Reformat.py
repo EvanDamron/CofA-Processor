@@ -6,7 +6,7 @@ from PIL import Image as PILImage, ImageDraw, ImageFont
 import io
 
 # Step 1: Extract Images from PDF using PyMuPDF (fitz)
-pdf_path = "viscoplex_cofa.pdf"  # Update with your PDF file path
+pdf_path = "cofa pdfs/viscoplex.pdf"  # Update with your PDF file path
 
 doc = fitz.open(pdf_path)
 image_list = []
