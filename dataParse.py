@@ -1,5 +1,6 @@
 import json
 import psycopg2
+import boto3
 
 def clean_signature(signature):
     # Format the signature correctly
@@ -13,6 +14,21 @@ def normalize_na(value):
     If the value is a form of null switch it with None so the value in the database stays as NULL.
     """
     return None if value in ("N/A", "null", "Null") else value
+
+# Access the bucket and retrieve the correct PDF
+def upload_pdf_and_get_url(local_file_path, bucket_name='cofa-pdf-storage', region='us-east-1'):
+    s3 = boto3.client('s3')
+    s3_key = f'uploads/{local_file_path}'
+
+    s3.upload_file(
+        local_file_path,
+        bucket_name,
+        s3_key,
+        ExtraArgs={'ACL': 'public-read'} # Make the file publicly accessible
+    )
+
+    url = f'https://{bucket_name}.s3.{region}.amazonaws.com/{s3_key}'
+    return url
 
 # Connect to the database
 def insert_cofa_and_tests(json_path):
@@ -49,12 +65,14 @@ def insert_cofa_and_tests(json_path):
             tank_number,
             vehicle_number,
             shelf_life_exp_date,
-            signature
+            signature,
+            cofapdf
         )
-        VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
     """
 
+    pdf_url = upload_pdf_and_get_url("viscoplex_cofa.pdf") # Change to dynamically find the pdf name
 
     cursor.execute(
         insert_query,
@@ -75,7 +93,8 @@ def insert_cofa_and_tests(json_path):
             normalize_na(data.get("tank_number", "")),
             normalize_na(data.get("vehicle_number", "")),
             normalize_na(data.get("shelf_life_exp_date", "")),
-            clean_signature(normalize_na(data.get("signature", "")))
+            clean_signature(normalize_na(data.get("signature", ""))),
+            pdf_url
         )
     )
     # Get the ID associated with this CofA
@@ -127,6 +146,8 @@ def insert_cofa_and_tests(json_path):
             )
         )
 
+    
+
 
     connection.commit()
     cursor.close()
@@ -134,4 +155,4 @@ def insert_cofa_and_tests(json_path):
 
 if __name__ == "__main__":
     # Change raw material.json into whatever variable the json files will be coming in as
-    insert_cofa_and_tests("yubase_prompt1.json")
+    insert_cofa_and_tests("viscoplex_prompt1.json")
