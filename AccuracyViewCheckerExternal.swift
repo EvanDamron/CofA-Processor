@@ -75,7 +75,7 @@ struct AccuracyCheckerViewExternal: View {
     
     func fetchJSON() {
         guard let encodedName = pdfURL.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: "http://34.194.202.42:5000/upload?filename=\(encodedName)") else {
+              let url = URL(string: "http://34.204.5.67:5000/upload?filename=\(encodedName)") else {
             errorMessage = "Invalid URL."
             isLoading = false
             return
@@ -123,7 +123,7 @@ struct AccuracyCheckerViewExternal: View {
             }
         }
         
-        guard let url = URL(string: "http://34.194.202.42:5000/verify"),
+        guard let url = URL(string: "http://34.204.5.67:5000/verify"),
               let jsonData = try? JSONSerialization.data(withJSONObject: updatedJSON) else {
             errorMessage = "Failed to encode JSON."
             return
