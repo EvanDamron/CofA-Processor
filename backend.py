@@ -8,9 +8,18 @@ import io
 import model_eval
 import json
 import logging
-from dataParse import insert_cofa_and_tests_from_dict
+from dataParse import upload_pdf_and_get_url, insert_cofa_and_tests_from_dict
 
 app = Flask(__name__)
+
+def populate_database(data: dict):
+    try:
+        insert_cofa_and_tests_from_dict(data)
+        logging.info("Database populated successfully!")
+    except Exception as e:
+        logging.error(f"Error populating database: {e}")
+        raise e
+
 
 
 @app.route('/upload', methods=['POST', 'GET'])
@@ -37,9 +46,15 @@ def upload_file():
         image_path = 'output.png'
         image.save(image_path)
 
+        # Upload PDF to S3
+        file_stream = open(filepath, 'rb')
+        #pdf_url = upload_pdf_get_url(file_stream, file.filename)
+        file_stream.close()
+
 
         # Send to chatGPT
         response = extract_json_from_image(prompt, model, image_path)
+        #response['pdf_url'] = pdf_url
         print(response)
         print("Processed!")
         logging.info(response)
@@ -49,9 +64,61 @@ def upload_file():
         doc.close()
         os.remove(filepath)
 
+        populate_database(response)
+
         return jsonify(response), 200
     except Exception as e:
-        return {'error': str(e)}, 500
+        return {'error': str(e)}, 500 
+    
+
+
+#@app.route('/upload', methods=['POST', 'GET'])
+#def upload_file():
+#    print('made it here, connection established')
+#    logging.debug('made it here, connection established')
+#
+#    if 'file' not in request.files:
+#        return {'error': 'No file provided'}, 400
+#
+#    file = request.files['file']
+#
+#    try:
+#        # Save temporarily
+#        filepath = 'temp_file'
+#        file.save(filepath)
+#
+#        # Open with fitz (PyMuPDF)
+#        doc = fitz.open(filepath)
+#
+#        # Convert first page to image
+#        page = doc.load_page(0)
+#        pix = page.get_pixmap()
+#        image = PILImage.open(io.BytesIO(pix.tobytes("png")))
+#        image_path = 'output.png'
+#        image.save(image_path)
+#
+#        # ✅ FIXED: Upload PDF to S3
+#        file_stream = open(filepath, 'rb')
+#        pdf_url = upload_pdf_and_get_url(file_stream, "cofa.pdf")  # fixed name
+#        file_stream.close()
+#
+#        # Send to ChatGPT
+#        response = extract_json_from_image(prompt, model, image_path)
+#        response['pdf_url'] = pdf_url
+#        print(response)
+#        logging.info("Processed!")
+#
+#        # Cleanup
+#        doc.close()
+#        os.remove(filepath)
+#
+#        populate_database(response)
+#
+#        return jsonify(response), 200
+#
+#    except Exception as e:
+#        return {'error': str(e)}, 500
+#
 
 @app.route('/verify', methods=['POST'])
 def verify_and_save():
@@ -160,4 +227,4 @@ model = "gpt-4o"
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
