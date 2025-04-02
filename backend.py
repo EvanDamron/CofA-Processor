@@ -47,21 +47,6 @@ def upload_file():
     except Exception as e:
         return {'error': str(e)}, 500
 
-@app.route('/verify', methods=['POST'])
-def verify_and_save():
-    try:
-        corrected_data = request.json
-        if not corrected_data:
-            return {'error': 'No JSON data provided'}, 400
-
-        populate_database(corrected_data)
-
-        return {'message': 'Database populated successfully!'}, 200
-
-    except Exception as e:
-        return {'error': str(e)}, 500
-
-
 @app.route('/upload-immediately', methods=['POST'])
 def upload_immediately():
     if 'file' not in request.files:
@@ -95,6 +80,21 @@ def upload_immediately():
         os.remove(filepath)
 
         return {'message': 'File processed and data stored successfully!'}, 200
+
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+
+@app.route('/verify', methods=['POST'])
+def verify_and_save():
+    try:
+        corrected_data = request.json
+        if not corrected_data:
+            return {'error': 'No JSON data provided'}, 400
+
+        populate_database(corrected_data)
+
+        return {'message': 'Database populated successfully!'}, 200
 
     except Exception as e:
         return {'error': str(e)}, 500
