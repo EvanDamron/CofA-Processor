@@ -1,0 +1,3 @@
+{
+    "error": "You tried to pass a `BaseModel` class to `chat.completions.create()`; You must use `beta.chat.completions.parse()` instead"
+}

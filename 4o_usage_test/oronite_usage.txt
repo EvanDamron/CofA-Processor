@@ -1,0 +1,3 @@
+Prompt Tokens: 1686
+Completion Tokens: 478
+Total Tokens: 2164
