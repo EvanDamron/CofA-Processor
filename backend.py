@@ -62,6 +62,44 @@ def verify_and_save():
         return {'error': str(e)}, 500
 
 
+@app.route('/upload-immediately', methods=['POST'])
+def upload_immediately():
+    if 'file' not in request.files:
+        return {'error': 'No file provided'}, 400
+
+    file = request.files['file']
+
+    try:
+        # Save temporarily
+        filepath = 'temp_file'
+        file.save(filepath)
+
+        # Open with fitz (PyMuPDF)
+        doc = fitz.open(filepath)
+        page = doc.load_page(0)
+        pix = page.get_pixmap()
+        image = PILImage.open(io.BytesIO(pix.tobytes("png")))
+        image_path = 'output.png'
+        image.save(image_path)
+
+        # Extract data using the model
+        response = extract_json_from_image(prompt, model, image_path)
+        print(response)
+        print("Processed and storing in DB...")
+
+        # Populate the database directly
+        populate_database(response)
+
+        # Cleanup
+        doc.close()
+        os.remove(filepath)
+
+        return {'message': 'File processed and data stored successfully!'}, 200
+
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+
 # Placeholder for the database population function
 def populate_database(data: dict):
     # Replace this with your actual database population logic
