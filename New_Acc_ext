@@ -1,7 +1,7 @@
 import SwiftUI
 import PDFKit
 
-struct AccuracyCheckerViewExternal: View {
+struct EditablePDFFormView: View {
     let pdfURL: URL
     let initialJSON: [String: Any]
     
@@ -11,76 +11,82 @@ struct AccuracyCheckerViewExternal: View {
     @State private var errorMessage: String?
 
     var body: some View {
-        HStack(alignment: .top) {
-            PDFKitView(pdfDocument: PDFDocument(url: pdfURL)!)
-                .frame(width: 400)
-            
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    if let errorMessage = errorMessage {
-                        Text("Error: \(errorMessage)")
-                            .foregroundColor(.red)
-                    }
-
-                    ForEach(jsonData, id: \.key) { item in
-                        let key = item.key
-                        let value = item.value
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(key.capitalized)
-                                .font(.headline)
+        NavigationView {
+            VStack {
+                HStack(alignment: .top) {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 15) {
+                            if let errorMessage = errorMessage {
+                                Text("Error: \(errorMessage)")
+                                    .foregroundColor(.red)
+                            }
                             
-                            if let array = value as? [Any] {
-                                ForEach(array.indices, id: \.self) { i in
-                                    let fieldKey = "\(key)_\(i)"
-                                    TextField("\(key) \(i+1)", text: binding(for: fieldKey))
-                                        .keyboardType(.default)
-                                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                            ForEach(jsonData, id: \.key) { item in
+                                let key = item.key
+                                let value = item.value
+                                
+                                VStack(alignment: .leading) {
+                                    Text(key.capitalized)
+                                        .font(.headline)
+                                    
+                                    if let array = value as? [Any] {
+                                        ForEach(array.indices, id: \.self) { i in
+                                            let fieldKey = "\(key)_\(i)"
+                                            TextField("\(key) \(i + 1)", text: binding(for: fieldKey))
+                                                .keyboardType(.default)
+                                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                        }
+                                    } else {
+                                        TextField(key, text: binding(for: key))
+                                            .keyboardType(.default)
+                                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    }
                                 }
-                            } else {
-                                TextField(key, text: binding(for: key))
-                                    .keyboardType(.default)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                            }
+
+                            Button("Approve & Submit") {
+                                submitJSON()
+                            }
+                            .padding()
+                            .background(Color.green)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                            
+                            if submissionSuccess {
+                                Text("✅ Submitted successfully!")
+                                    .foregroundColor(.green)
                             }
                         }
+                        .padding()
                     }
+                    .frame(minWidth: 400)
 
-                    Button("Approve & Submit") {
-                        submitJSON()
-                    }
-                    .padding()
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    
-                    if submissionSuccess {
-                        Text("✅ Submission successful!")
-                            .foregroundColor(.green)
-                    }
+                    Divider()
+
+                    PDFViewWrapper(url: pdfURL)
+                        .frame(width: 400, height: 600)
                 }
-                .padding()
+            }
+            .navigationTitle("Editable Form")
+            .onAppear {
+                loadInitialJSON()
             }
         }
-        .navigationTitle("ChatGPT Result")
-        .onAppear {
-            loadInitialJSON()
-        }
     }
-    
+
     private func binding(for key: String) -> Binding<String> {
-        Binding<String>(
-            get: { self.textFields[key, default: ""] },
-            set: { self.textFields[key] = $0 }
+        Binding(
+            get: { textFields[key, default: ""] },
+            set: { textFields[key] = $0 }
         )
     }
-    
+
     private func loadInitialJSON() {
         jsonData = initialJSON.sorted { $0.key < $1.key }
         for (key, value) in initialJSON {
             if let array = value as? [Any] {
                 for i in array.indices {
-                    let fieldKey = "\(key)_\(i)"
-                    textFields[fieldKey] = String(describing: array[i])
+                    textFields["\(key)_\(i)"] = String(describing: array[i])
                 }
             } else {
                 textFields[key] = String(describing: value)
@@ -89,39 +95,68 @@ struct AccuracyCheckerViewExternal: View {
     }
 
     private func submitJSON() {
-        var updatedJSON: [String: Any] = [:]
+        var updated: [String: Any] = [:]
         
         for (key, value) in jsonData {
             if let array = value as? [Any] {
-                let values = array.indices.map { i in
-                    textFields["\(key)_\(i)"] ?? ""
-                }
-                updatedJSON[key] = values
+                updated[key] = array.indices.map { textFields["\(key)_\($0)"] ?? "" }
             } else {
-                updatedJSON[key] = textFields[key] ?? ""
+                updated[key] = textFields[key] ?? ""
             }
         }
-        
+
         guard let url = URL(string: "http://34.194.202.42:5000/verify"),
-              let jsonData = try? JSONSerialization.data(withJSONObject: updatedJSON) else {
-            errorMessage = "Failed to encode JSON."
+              let body = try? JSONSerialization.data(withJSONObject: updated) else {
+            errorMessage = "Failed to encode JSON"
             return
         }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = jsonData
-        
-        URLSession.shared.dataTask(with: request) { _, response, error in
+
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = body
+
+        URLSession.shared.dataTask(with: req) { _, _, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    self.errorMessage = "Submit error: \(error.localizedDescription)"
+                    errorMessage = error.localizedDescription
                 } else {
-                    self.errorMessage = nil
-                    self.submissionSuccess = true
+                    submissionSuccess = true
+                    errorMessage = nil
                 }
             }
         }.resume()
     }
+}
+
+// MARK: - PDFKit View Wrapper
+
+struct PDFViewWrapper: UIViewRepresentable {
+    let url: URL
+
+    func makeUIView(context: Context) -> PDFView {
+        let pdfView = PDFView()
+        if let doc = PDFDocument(url: url) {
+            pdfView.document = doc
+        }
+        pdfView.autoScales = true
+        pdfView.displayMode = .singlePageContinuous
+        pdfView.displayDirection = .vertical
+        pdfView.backgroundColor = .secondarySystemBackground
+        return pdfView
+    }
+
+    func updateUIView(_ uiView: PDFView, context: Context) {}
+}
+
+// MARK: - Preview Example
+
+#Preview {
+    let sampleURL = Bundle.main.url(forResource: "sample", withExtension: "pdf")!
+    let sampleData: [String: Any] = [
+        "name": "John Doe",
+        "batch": ["A23", "B45"],
+        "date": "2025-04-09"
+    ]
+    return EditablePDFFormView(pdfURL: sampleURL, initialJSON: sampleData)
 }
