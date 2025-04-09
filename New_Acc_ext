@@ -10,18 +10,24 @@ struct AccuracyCheckerViewExternal: View {
     @State private var submissionSuccess = false
     @State private var errorMessage: String?
 
+    @State private var selectedTab = 0
+
     var body: some View {
-        HStack {
+        TabView(selection: $selectedTab) {
+            // 1. Editor Tab
             ScrollView {
                 VStack(alignment: .leading, spacing: 15) {
-                    if let errorMessage = errorMessage {
-                        Text("Error: \(errorMessage)")
+                    if let error = errorMessage {
+                        Text("Error: \(error)")
                             .foregroundColor(.red)
                     }
 
-                    // Render each field section
                     ForEach(jsonData, id: \.key) { item in
-                        EditableFieldGroup(key: item.key, value: item.value, textFields: $textFields)
+                        EditableFieldGroup(
+                            key: item.key,
+                            value: item.value,
+                            textFields: $textFields
+                        )
                     }
 
                     Button("Approve & Submit") {
@@ -39,19 +45,24 @@ struct AccuracyCheckerViewExternal: View {
                 }
                 .padding()
             }
+            .tag(0)
+            .tabItem {
+                Label("Edit Data", systemImage: "square.and.pencil")
+            }
 
-            Divider()
-
+            // 2. PDF Preview Tab
             PDFViewWrapper(url: pdfURL)
-                .frame(width: 400, height: 600)
+                .tag(1)
+                .tabItem {
+                    Label("View PDF", systemImage: "doc.richtext")
+                }
         }
-        .navigationTitle("ChatGPT Result")
+        .navigationTitle("Accuracy Checker")
         .onAppear {
             loadInitialJSON()
         }
     }
 
-    // Load initial JSON into editable fields
     private func loadInitialJSON() {
         jsonData = initialJSON.sorted { $0.key < $1.key }
         for (key, value) in initialJSON {
@@ -65,7 +76,6 @@ struct AccuracyCheckerViewExternal: View {
         }
     }
 
-    // Submit modified JSON to backend
     private func submitJSON() {
         var updatedJSON: [String: Any] = [:]
 
@@ -103,7 +113,7 @@ struct AccuracyCheckerViewExternal: View {
     }
 }
 
-// MARK: - Field Renderer (Sub View)
+// MARK: - EditableFieldGroup
 struct EditableFieldGroup: View {
     let key: String
     let value: Any
@@ -136,7 +146,7 @@ struct EditableFieldGroup: View {
     }
 }
 
-// MARK: - PDFKitView
+// MARK: - PDFViewWrapper
 struct PDFViewWrapper: UIViewRepresentable {
     let url: URL
 
