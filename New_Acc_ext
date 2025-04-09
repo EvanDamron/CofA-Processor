@@ -1,5 +1,3 @@
-// AccuracyCheckerViewExternal.swift
-
 import SwiftUI
 import PDFKit
 
@@ -22,26 +20,7 @@ struct AccuracyCheckerViewExternal: View {
                     }
 
                     ForEach(jsonData, id: \.key) { item in
-                        let key = item.key
-                        let value = item.value
-
-                        VStack(alignment: .leading) {
-                            Text(key.capitalized)
-                                .font(.headline)
-
-                            if let array = value as? [Any] {
-                                ForEach(array.indices, id: \.self) { i in
-                                    let fieldKey = "\(key)_\(i)"
-                                    TextField("\(key) \(i + 1)", text: $textFields[fieldKey, default: ""])
-                                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                                        .keyboardType(.default)
-                                }
-                            } else {
-                                TextField(key, text: $textFields[key, default: ""])
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .keyboardType(.default)
-                            }
-                        }
+                        fieldSection(for: item)
                     }
 
                     Button("Approve & Submit") {
@@ -71,6 +50,32 @@ struct AccuracyCheckerViewExternal: View {
         }
     }
 
+    // MARK: - Helper View Builder
+
+    @ViewBuilder
+    private func fieldSection(for item: (key: String, value: Any)) -> some View {
+        let key = item.key
+        let value = item.value
+
+        VStack(alignment: .leading) {
+            Text(key.capitalized)
+                .font(.headline)
+
+            if let array = value as? [Any] {
+                ForEach(array.indices, id: \.self) { i in
+                    let fieldKey = "\(key)_\(i)"
+                    TextField("\(key) \(i + 1)", text: $textFields[fieldKey, default: ""])
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .keyboardType(.default)
+                }
+            } else {
+                TextField(key, text: $textFields[key, default: ""])
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .keyboardType(.default)
+            }
+        }
+    }
+
     private func loadInitialJSON() {
         jsonData = initialJSON.sorted { $0.key < $1.key }
         for (key, value) in initialJSON {
@@ -89,8 +94,7 @@ struct AccuracyCheckerViewExternal: View {
 
         for (key, value) in jsonData {
             if let array = value as? [Any] {
-                let values = array.indices.map { textFields["\(key)_\($0)"] ?? "" }
-                updatedJSON[key] = values
+                updatedJSON[key] = array.indices.map { textFields["\(key)_\($0)"] ?? "" }
             } else {
                 updatedJSON[key] = textFields[key] ?? ""
             }
@@ -119,6 +123,8 @@ struct AccuracyCheckerViewExternal: View {
         }.resume()
     }
 }
+
+// MARK: - PDF View
 
 struct PDFViewWrapper: UIViewRepresentable {
     let url: URL
