@@ -9,51 +9,42 @@ struct AccuracyCheckerViewExternal: View {
     @State private var textFields: [String: String] = [:]
     @State private var submissionSuccess = false
     @State private var errorMessage: String?
-    
+
     var body: some View {
         HStack(alignment: .top) {
             PDFKitView(pdfDocument: PDFDocument(url: pdfURL)!)
                 .frame(width: 400)
             
             ScrollView {
-                VStack(alignment: .leading, spacing: 15) {
+                VStack(alignment: .leading, spacing: 20) {
                     if let errorMessage = errorMessage {
                         Text("Error: \(errorMessage)")
                             .foregroundColor(.red)
-                            .padding(.bottom)
                     }
-                    
-                    ForEach(0..<jsonData.count, id: \.self) { index in
-                        let key = jsonData[index].key
-                        let value = jsonData[index].value
+
+                    ForEach(jsonData, id: \.key) { item in
+                        let key = item.key
+                        let value = item.value
                         
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text(key.capitalized)
                                 .font(.headline)
                             
                             if let array = value as? [Any] {
-                                ForEach(0..<array.count, id: \.self) { i in
+                                ForEach(array.indices, id: \.self) { i in
                                     let fieldKey = "\(key)_\(i)"
-                                    TextField("\(key) \(i+1)", text: Binding(
-                                        get: { textFields[fieldKey] ?? "" },
-                                        set: { textFields[fieldKey] = $0 }
-                                    ))
-                                    .keyboardType(.default)
-                                    .id(fieldKey)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    TextField("\(key) \(i+1)", text: binding(for: fieldKey))
+                                        .keyboardType(.default)
+                                        .textFieldStyle(RoundedBorderTextFieldStyle())
                                 }
                             } else {
-                                TextField("\(key)", text: Binding(
-                                    get: { textFields[key] ?? "" },
-                                    set: { textFields[key] = $0 }
-                                ))
-                                .keyboardType(.default)
-                                .id("\(key)_textfield")
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                TextField(key, text: binding(for: key))
+                                    .keyboardType(.default)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
                             }
                         }
                     }
-                    
+
                     Button("Approve & Submit") {
                         submitJSON()
                     }
@@ -61,6 +52,11 @@ struct AccuracyCheckerViewExternal: View {
                     .background(Color.green)
                     .foregroundColor(.white)
                     .cornerRadius(10)
+                    
+                    if submissionSuccess {
+                        Text("✅ Submission successful!")
+                            .foregroundColor(.green)
+                    }
                 }
                 .padding()
             }
@@ -69,13 +65,13 @@ struct AccuracyCheckerViewExternal: View {
         .onAppear {
             loadInitialJSON()
         }
-        .alert(isPresented: $submissionSuccess) {
-            Alert(
-                title: Text("Success"),
-                message: Text("Data has been submitted successfully!"),
-                dismissButton: .default(Text("OK"))
-            )
-        }
+    }
+    
+    private func binding(for key: String) -> Binding<String> {
+        Binding<String>(
+            get: { self.textFields[key, default: ""] },
+            set: { self.textFields[key] = $0 }
+        )
     }
     
     private func loadInitialJSON() {
@@ -83,24 +79,24 @@ struct AccuracyCheckerViewExternal: View {
         for (key, value) in initialJSON {
             if let array = value as? [Any] {
                 for i in array.indices {
-                    textFields["\(key)_\(i)"] = String(describing: array[i])
+                    let fieldKey = "\(key)_\(i)"
+                    textFields[fieldKey] = String(describing: array[i])
                 }
             } else {
                 textFields[key] = String(describing: value)
             }
         }
     }
-    
+
     private func submitJSON() {
         var updatedJSON: [String: Any] = [:]
         
         for (key, value) in jsonData {
             if let array = value as? [Any] {
-                var updatedArray: [String] = []
-                for i in 0..<array.count {
-                    updatedArray.append(textFields["\(key)_\(i)"] ?? "")
+                let values = array.indices.map { i in
+                    textFields["\(key)_\(i)"] ?? ""
                 }
-                updatedJSON[key] = updatedArray
+                updatedJSON[key] = values
             } else {
                 updatedJSON[key] = textFields[key] ?? ""
             }
@@ -120,10 +116,10 @@ struct AccuracyCheckerViewExternal: View {
         URLSession.shared.dataTask(with: request) { _, response, error in
             DispatchQueue.main.async {
                 if let error = error {
-                    errorMessage = "Submit error: \(error.localizedDescription)"
+                    self.errorMessage = "Submit error: \(error.localizedDescription)"
                 } else {
-                    errorMessage = nil
-                    submissionSuccess = true
+                    self.errorMessage = nil
+                    self.submissionSuccess = true
                 }
             }
         }.resume()
