@@ -9,16 +9,15 @@ struct AccuracyCheckerViewExternal: View {
     @State private var textFields: [String: String] = [:]
     @State private var submissionSuccess = false
     @State private var errorMessage: String?
-
     @State private var selectedTab = 0
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            // 1. Editor Tab
+            // 1. Editing Tab
             ScrollView {
                 VStack(alignment: .leading, spacing: 15) {
-                    if let error = errorMessage {
-                        Text("Error: \(error)")
+                    if let errorMessage = errorMessage {
+                        Text("Error: \(errorMessage)")
                             .foregroundColor(.red)
                     }
 
@@ -47,10 +46,10 @@ struct AccuracyCheckerViewExternal: View {
             }
             .tag(0)
             .tabItem {
-                Label("Edit Data", systemImage: "square.and.pencil")
+                Label("Edit Fields", systemImage: "square.and.pencil")
             }
 
-            // 2. PDF Preview Tab
+            // 2. PDF Viewer Tab
             PDFViewWrapper(url: pdfURL)
                 .tag(1)
                 .tabItem {
@@ -113,7 +112,7 @@ struct AccuracyCheckerViewExternal: View {
     }
 }
 
-// MARK: - EditableFieldGroup
+// MARK: - EditableFieldGroup Subview
 struct EditableFieldGroup: View {
     let key: String
     let value: Any
@@ -146,7 +145,7 @@ struct EditableFieldGroup: View {
     }
 }
 
-// MARK: - PDFViewWrapper
+// MARK: - PDFViewWrapper (No Focus Hijacking)
 struct PDFViewWrapper: UIViewRepresentable {
     let url: URL
 
@@ -158,6 +157,7 @@ struct PDFViewWrapper: UIViewRepresentable {
         pdfView.autoScales = true
         pdfView.displayMode = .singlePageContinuous
         pdfView.displayDirection = .vertical
+
         return pdfView
     }
 
