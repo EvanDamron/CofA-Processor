@@ -9,15 +9,15 @@ struct AccuracyCheckerViewExternal: View {
     @State private var textFields: [String: String] = [:]
     @State private var submissionSuccess = false
     @State private var errorMessage: String?
-    @State private var selectedTab = 0
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            // 1. Editing Tab
+        // Lay out side-by-side
+        HStack(alignment: .top) {
+            // Left side: Scrollable list of text fields
             ScrollView {
                 VStack(alignment: .leading, spacing: 15) {
-                    if let errorMessage = errorMessage {
-                        Text("Error: \(errorMessage)")
+                    if let error = errorMessage {
+                        Text("Error: \(error)")
                             .foregroundColor(.red)
                     }
 
@@ -43,18 +43,14 @@ struct AccuracyCheckerViewExternal: View {
                     }
                 }
                 .padding()
-            }
-            .tag(0)
-            .tabItem {
-                Label("Edit Fields", systemImage: "square.and.pencil")
+                .frame(minWidth: 300) // Adjust as needed
             }
 
-            // 2. PDF Viewer Tab
+            Divider()
+
+            // Right side: PDF with interaction disabled
             PDFViewWrapper(url: pdfURL)
-                .tag(1)
-                .tabItem {
-                    Label("View PDF", systemImage: "doc.richtext")
-                }
+                .frame(width: 400, height: 600)
         }
         .navigationTitle("Accuracy Checker")
         .onAppear {
@@ -112,7 +108,7 @@ struct AccuracyCheckerViewExternal: View {
     }
 }
 
-// MARK: - EditableFieldGroup Subview
+// MARK: - Subview for rendering each key/array as text fields
 struct EditableFieldGroup: View {
     let key: String
     let value: Any
@@ -126,26 +122,26 @@ struct EditableFieldGroup: View {
             if let array = value as? [Any] {
                 ForEach(array.indices, id: \.self) { i in
                     let fieldKey = "\(key)_\(i)"
-                    TextField("\(key) \(i + 1)", text: Binding(
-                        get: { textFields[fieldKey, default: ""] },
-                        set: { textFields[fieldKey] = $0 }
-                    ))
+                    TextField("\(key) \(i + 1)",
+                              text: Binding(
+                                get: { textFields[fieldKey, default: ""] },
+                                set: { textFields[fieldKey] = $0 }
+                              ))
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .keyboardType(.default)
                 }
             } else {
-                TextField(key, text: Binding(
-                    get: { textFields[key, default: ""] },
-                    set: { textFields[key] = $0 }
-                ))
+                TextField(key,
+                          text: Binding(
+                            get: { textFields[key, default: ""] },
+                            set: { textFields[key] = $0 }
+                          ))
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                .keyboardType(.default)
             }
         }
     }
 }
 
-// MARK: - PDFViewWrapper (No Focus Hijacking)
+// MARK: - PDFKit view with interaction disabled (so text fields are editable)
 struct PDFViewWrapper: UIViewRepresentable {
     let url: URL
 
@@ -154,9 +150,13 @@ struct PDFViewWrapper: UIViewRepresentable {
         if let doc = PDFDocument(url: url) {
             pdfView.document = doc
         }
+        // Fill the view
         pdfView.autoScales = true
         pdfView.displayMode = .singlePageContinuous
         pdfView.displayDirection = .vertical
+
+        // Disable all interaction so it cannot steal keyboard focus
+        pdfView.isUserInteractionEnabled = false
 
         return pdfView
     }
