@@ -1,0 +1,106 @@
+// FileDetailView.swift
+
+import SwiftUI
+import PDFKit
+import Vision
+
+struct FileDetailView: View {
+    let fileURL: URL
+
+    @State private var pdfDocument: PDFDocument?
+    @State private var isUploading = false
+    @State private var isOCRComplete = false
+    @State private var resultFromServer: [String: Any] = [:]
+    @State private var errorMessage: String?
+    @State private var showAccuracyChecker = false
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Uploaded File:")
+                .font(.headline)
+            Text(fileURL.lastPathComponent)
+                .font(.subheadline)
+                .foregroundColor(.blue)
+
+            if let pdf = pdfDocument {
+                PDFKitView(pdfDocument: pdf)
+                    .frame(height: 500)
+            }
+
+            if isUploading {
+                ProgressView("Uploading and Processing…")
+                    .padding()
+            }
+
+            if isOCRComplete && !resultFromServer.isEmpty {
+                Button("Continue to Accuracy Checker") {
+                    showAccuracyChecker = true
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+            }
+
+            if let error = errorMessage {
+                Text("❌ \(error)")
+                    .foregroundColor(.red)
+            }
+
+            NavigationLink(
+                destination: AccuracyCheckerViewExternal(
+                    pdfURL: fileURL,
+                    initialJSON: resultFromServer
+                ),
+                isActive: $showAccuracyChecker
+            ) {
+                EmptyView()
+            }
+
+            Spacer()
+        }
+        .padding()
+        .navigationTitle("File Details")
+        .onAppear {
+            loadAndUploadPDF()
+        }
+    }
+
+    private func loadAndUploadPDF() {
+        guard !isUploading else { return }
+        isUploading = true
+
+        if let pdf = PDFDocument(url: fileURL) {
+            self.pdfDocument = pdf
+        }
+
+        uploadPDF(to: "http://34.194.202.42:5000/upload", fileURL: fileURL) { result, error in
+            DispatchQueue.main.async {
+                self.isUploading = false
+                self.isOCRComplete = true
+
+                if let result = result {
+                    self.resultFromServer = result
+                } else if let error = error {
+                    self.errorMessage = error
+                }
+            }
+        }
+    }
+}
+
+// Optional PDFKitView you can use in multiple views
+struct PDFKitView: UIViewRepresentable {
+    let pdfDocument: PDFDocument
+
+    func makeUIView(context: Context) -> PDFView {
+        let pdfView = PDFView()
+        pdfView.document = pdfDocument
+        pdfView.autoScales = true
+        pdfView.displayMode = .singlePageContinuous
+        pdfView.displayDirection = .vertical
+        return pdfView
+    }
+
+    func updateUIView(_ uiView: PDFView, context: Context) {}
+}
