@@ -24,7 +24,10 @@ def upload_pdf_and_get_url(local_file_path, bucket_name='cofa-pdf-storage', regi
         local_file_path,
         bucket_name,
         s3_key,
-        ExtraArgs={'ACL': 'public-read'} # Make the file publicly accessible
+        ExtraArgs={
+            'ContentType': 'application/pdf',
+            'ContentDisposition': 'inline'
+        }
     )
 
     url = f'https://{bucket_name}.s3.{region}.amazonaws.com/{s3_key}'
@@ -33,7 +36,7 @@ def upload_pdf_and_get_url(local_file_path, bucket_name='cofa-pdf-storage', regi
 # Connect to the database
 def insert_cofa_and_tests(json_path):
     connection = psycopg2.connect(
-        host="34.204.5.67",
+        host="34.194.202.42",
         port=5432,
         user="admin",
         password="admin123",
