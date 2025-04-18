@@ -102,11 +102,58 @@
 # unprocessed_image = Image.open(image_path)
 # output_image = draw_text_boxes(unprocessed_image)
 import cv2
-import pytesseract
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
 import random
 import numpy as np
+
+
+
+# def draw_text_boxes(image, data, merged_boxes):
+#     """Draw original and merged text boxes for comparison."""
+#
+#     before_image = image.copy()
+#     after_image = image.copy()
+#
+#     before_draw = ImageDraw.Draw(before_image)
+#     after_draw = ImageDraw.Draw(after_image)
+#
+#     try:
+#         font = ImageFont.truetype("arial.ttf", 12)
+#     except:
+#         font = ImageFont.load_default()
+#
+#     # Draw original boxes (red)
+#     for i in range(len(data['text'])):
+#         if data['text'][i].strip():
+#             x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
+#             before_draw.rectangle([(x, y), (x + w, y + h)], outline="red", width=2)
+#             before_draw.text((x, y - 10), data['text'][i], fill="red", font=font)
+#
+#     # Draw merged boxes (green)
+#     for box in merged_boxes:
+#         after_draw.rectangle([(box['left'], box['top']), (box['right'], box['bottom'])], outline="green", width=3)
+#         after_draw.text((box['left'], box['top'] - 10), box['text'], fill="green", font=font)
+#
+#     # Display side-by-side comparison
+#     fig, axes = plt.subplots(1, 2, figsize=(20, 12))
+#
+#     axes[0].imshow(before_image)
+#     axes[0].set_title("Before Merging (Original Text Boxes)")
+#     axes[0].axis("off")
+#
+#     axes[1].imshow(after_image)
+#     axes[1].set_title("After Merging (Merged Text Boxes)")
+#     axes[1].axis("off")
+#
+#     plt.show()
+
+
+import matplotlib.pyplot as plt
+from PIL import Image, ImageDraw, ImageFont
+import random
+import pytesseract
+
 
 
 # Configure pytesseract to use the installed Tesseract executable
@@ -131,25 +178,72 @@ def merge_two_boxes(box1, box2):
     }
 
 
-import matplotlib.pyplot as plt
-from PIL import Image, ImageDraw, ImageFont
-import random
-
 
 def random_color():
     """Generate a random RGB color."""
     return tuple(random.randint(50, 200) for _ in range(3))
 
 
+# def draw_text_boxes(image, data, clusters):
+#     """
+#     Draw original OCR text boxes and clustered merged boxes with different colors.
+#
+#     Parameters:
+#     - image: PIL.Image object.
+#     - data: Original Tesseract output data dictionary (with 'text', 'left', 'top', 'width', 'height').
+#     - clusters: List of clusters, where each cluster is a list of merged box dictionaries.
+#     """
+#     before_image = image.copy()
+#     after_image = image.copy()
+#
+#     before_draw = ImageDraw.Draw(before_image)
+#     after_draw = ImageDraw.Draw(after_image)
+#
+#     try:
+#         font = ImageFont.truetype("arial.ttf", 12)
+#     except:
+#         font = ImageFont.load_default()
+#
+#     # Draw original boxes (red)
+#     for i in range(len(data['text'])):
+#         if data['text'][i].strip():
+#             x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
+#             before_draw.rectangle([(x, y), (x + w, y + h)], outline="red", width=2)
+#             before_draw.text((x, y - 10), data['text'][i], fill="red", font=font)
+#
+#     # Draw merged clusters with different colors
+#     for cluster in clusters:
+#         cluster_color = random_color()  # Different color for each cluster
+#         for box in cluster:
+#             after_draw.rectangle(
+#                 [(box['left'], box['top']), (box['right'], box['bottom'])],
+#                 outline=cluster_color,
+#                 width=3
+#             )
+#             after_draw.text(
+#                 (box['left'], box['top'] - 10),
+#                 box['text'],
+#                 fill=cluster_color,
+#                 font=font
+#             )
+#
+#     # Display side-by-side comparison
+#     fig, axes = plt.subplots(1, 2, figsize=(20, 12))
+#
+#     axes[0].imshow(before_image)
+#     axes[0].set_title("Before Merging (Original Text Boxes)")
+#     axes[0].axis("off")
+#
+#     axes[1].imshow(after_image)
+#     axes[1].set_title("After Merging (Clustered Merged Text Boxes)")
+#     axes[1].axis("off")
+#
+#     plt.show()
 def draw_text_boxes(image, data, clusters):
     """
-    Draw original OCR text boxes and clustered merged boxes with different colors.
-
-    Parameters:
-    - image: PIL.Image object.
-    - data: Original Tesseract output data dictionary (with 'text', 'left', 'top', 'width', 'height').
-    - clusters: List of clusters, where each cluster is a list of merged box dictionaries.
+    Draw original OCR text boxes and clustered merged boxes in two separate windows.
     """
+
     before_image = image.copy()
     after_image = image.copy()
 
@@ -157,45 +251,46 @@ def draw_text_boxes(image, data, clusters):
     after_draw = ImageDraw.Draw(after_image)
 
     try:
-        font = ImageFont.truetype("arial.ttf", 12)
+        font = ImageFont.truetype("arial.ttf", 14)  # slightly larger font
     except:
         font = ImageFont.load_default()
 
-    # Draw original boxes (red)
+    # Draw original boxes (bold red)
     for i in range(len(data['text'])):
         if data['text'][i].strip():
             x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
-            before_draw.rectangle([(x, y), (x + w, y + h)], outline="red", width=2)
-            before_draw.text((x, y - 10), data['text'][i], fill="red", font=font)
+            before_draw.rectangle([(x, y), (x + w, y + h)], outline="red", width=4)
+            before_draw.text((x, y - 12), data['text'][i], fill="red", font=font)
 
-    # Draw merged clusters with different colors
+    # Draw merged clusters with different bold colors
     for cluster in clusters:
-        cluster_color = random_color()  # Different color for each cluster
+        cluster_color = random_color()
         for box in cluster:
             after_draw.rectangle(
                 [(box['left'], box['top']), (box['right'], box['bottom'])],
                 outline=cluster_color,
-                width=3
+                width=4  # thicker line
             )
             after_draw.text(
-                (box['left'], box['top'] - 10),
+                (box['left'], box['top'] - 12),
                 box['text'],
                 fill=cluster_color,
                 font=font
             )
 
-    # Display side-by-side comparison
-    fig, axes = plt.subplots(1, 2, figsize=(20, 12))
+    # Show "Before Merging" image
+    plt.figure(figsize=(10, 12))
+    plt.imshow(before_image)
+    plt.title("Before Merging (Original Text Boxes)", fontsize=30)
+    plt.axis("off")
+    plt.show(block=True)  # Wait until user closes
 
-    axes[0].imshow(before_image)
-    axes[0].set_title("Before Merging (Original Text Boxes)")
-    axes[0].axis("off")
-
-    axes[1].imshow(after_image)
-    axes[1].set_title("After Merging (Clustered Merged Text Boxes)")
-    axes[1].axis("off")
-
-    plt.show()
+    # Show "After Merging" image
+    plt.figure(figsize=(10, 12))
+    plt.imshow(after_image)
+    plt.title("Merged and Clustered Text Boxes", fontsize=30)
+    plt.axis("off")
+    plt.show(block=True)  # Wait until user closes
 
 
 def iterative_merge_text_boxes(data, horizontal_threshold=30, vertical_threshold=10):
@@ -238,47 +333,6 @@ def iterative_merge_text_boxes(data, horizontal_threshold=30, vertical_threshold
 
     print(f"Merging completed in {iteration} iteration(s).")
     return boxes
-
-
-# def draw_text_boxes(image, data, merged_boxes):
-#     """Draw original and merged text boxes for comparison."""
-#
-#     before_image = image.copy()
-#     after_image = image.copy()
-#
-#     before_draw = ImageDraw.Draw(before_image)
-#     after_draw = ImageDraw.Draw(after_image)
-#
-#     try:
-#         font = ImageFont.truetype("arial.ttf", 12)
-#     except:
-#         font = ImageFont.load_default()
-#
-#     # Draw original boxes (red)
-#     for i in range(len(data['text'])):
-#         if data['text'][i].strip():
-#             x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
-#             before_draw.rectangle([(x, y), (x + w, y + h)], outline="red", width=2)
-#             before_draw.text((x, y - 10), data['text'][i], fill="red", font=font)
-#
-#     # Draw merged boxes (green)
-#     for box in merged_boxes:
-#         after_draw.rectangle([(box['left'], box['top']), (box['right'], box['bottom'])], outline="green", width=3)
-#         after_draw.text((box['left'], box['top'] - 10), box['text'], fill="green", font=font)
-#
-#     # Display side-by-side comparison
-#     fig, axes = plt.subplots(1, 2, figsize=(20, 12))
-#
-#     axes[0].imshow(before_image)
-#     axes[0].set_title("Before Merging (Original Text Boxes)")
-#     axes[0].axis("off")
-#
-#     axes[1].imshow(after_image)
-#     axes[1].set_title("After Merging (Merged Text Boxes)")
-#     axes[1].axis("off")
-#
-#     plt.show()
-
 
 def process_image(image_path, horizontal_threshold=30, vertical_threshold=10):
     """Run OCR, iteratively merge text boxes, and display results."""
