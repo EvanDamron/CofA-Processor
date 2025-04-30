@@ -1,6 +1,7 @@
 import json
 import psycopg2
 import boto3
+import os
 
 def clean_signature(signature):
     # Format the signature correctly
@@ -18,7 +19,8 @@ def normalize_na(value):
 # Access the bucket and retrieve the correct PDF
 def upload_pdf_and_get_url(local_file_path, bucket_name='cofa-pdf-storage', region='us-east-1'):
     s3 = boto3.client('s3')
-    s3_key = f'uploads/{local_file_path}'
+    filename = os.path.basename(local_file_path)
+    s3_key = f'uploads/{filename}'
 
     s3.upload_file(
         local_file_path,
@@ -34,7 +36,7 @@ def upload_pdf_and_get_url(local_file_path, bucket_name='cofa-pdf-storage', regi
     return url
 
 # Connect to the database
-def insert_cofa_and_tests_from_dict(data: dict):
+def insert_cofa_and_tests_from_dict(data: dict, pdf_url: str):
     connection = psycopg2.connect(
         host="localhost",
         port=5432,
@@ -43,8 +45,6 @@ def insert_cofa_and_tests_from_dict(data: dict):
         dbname="cofa_db"
     )
     cursor = connection.cursor()
-
-    pdf_url = data.get("pdf_url")
 
 
     # Insert query for the CofA
